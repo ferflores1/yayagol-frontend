@@ -1,0 +1,17 @@
+{
+  "name": "Yayagol - Quiniela Familiar",
+  "short_name": "Yayagol",
+  "description": "Quiniela familiar para el Mundial 2026",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fae3",
+  "theme_color": "#184a42",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
