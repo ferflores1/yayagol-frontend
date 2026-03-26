@@ -22,13 +22,24 @@ export default function GroupPredictions() {
   }, [selectedDate]);
 
   const loadData = async () => {
-    try {
-      const response = await api.get(`/group-predictions?date=${selectedDate}&groupId=${groupId}`);
+      try {
+          if (!groupId) return; // no group selected, stop
 
-      setData(response.data);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+          // verify groupId belongs to current user
+          const groupsRes = await api.get('/quiniela/my-groups');
+          const belongsToUser = groupsRes.data.some((g: any) => g.id.toString() === groupId);
+
+          if (!belongsToUser) {
+            localStorage.removeItem('selectedGroup');
+            return; // groupId is stale, stop
+          }
+
+          const response = await api.get(`/group-predictions?date=${selectedDate}&groupId=${groupId}`);
+          setData(response.data);
+      }
+        catch (error) {
+            console.error('Error:', error);
+        }
   };
 
   return (

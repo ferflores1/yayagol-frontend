@@ -14,14 +14,12 @@ export default function Leaderboard() {
   const loadLeaderboard = async () => {
     try {
       const groupId = localStorage.getItem('selectedGroup');
-      const response = await api.get(`/quiniela/leaderboard?groupId=${groupId}`);
+      const response = await api.get(`/leaderboard?groupId=${groupId}`);
       setPlayers(response.data);
     } catch (error) {
       console.error('Error:', error);
     }
   };
-
-  const medals = ['🥇', '🥈', '🥉'];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -41,12 +39,7 @@ export default function Leaderboard() {
                 const rank = i + 1;
                 return (
                   <tr key={i}>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        {rank <= 3 && <span className="text-xl">{medals[rank - 1]}</span>}
-                        <span>{rank}</span>
-                      </div>
-                    </td>
+                   <td className="px-6 py-4 font-bold text-gray-900">{rank}</td>
                     <td className="px-6 py-4 font-medium">{p.name}</td>
                     <td className="px-6 py-4 text-right font-semibold">{p.points}</td>
                   </tr>

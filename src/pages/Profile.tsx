@@ -6,6 +6,7 @@ import api, { logout } from '../services/api';
 export default function Profile() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [saved, setSaved] = useState(false);
 
     useEffect(() => {
       api.get('/auth/me').then(res => {
@@ -18,10 +19,13 @@ export default function Profile() {
 
     const saveProfile = async () => {
         try {
-          await api.put('/user/profile', { name, email });
-          alert('Saved!');
+          await api.put('/auth/user/update', null, {
+            params: { name, email }
+          });
+          setSaved(true);
+          setTimeout(() => setSaved(false), 1500);
         } catch (error) {
-          alert('Error saving');
+          console.log('Error saving');
         }
     };
 
@@ -30,7 +34,7 @@ export default function Profile() {
           <Header title="Menu" />
           <main className="max-w-2xl mx-auto px-4 py-8">
             <div className="text-center mb-6">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 text-5xl">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 text-7xl">
                 {emoji}
               </div>
               <h2 className="text-3xl font-bold">{name}</h2>
@@ -39,15 +43,22 @@ export default function Profile() {
               <button className="px-6 py-2 border-b-2 border-primary text-primary font-medium">Mis datos</button>
             </div>
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-2">Nombre</label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Nombre</label>
+              <div className="relative">
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-100 rounded"
                 />
+                {saved && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-sm text-xl font-medium animate-pulse">
+                    ✓
+                  </span>
+                )}
               </div>
+            </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Email</label>
                 <input
