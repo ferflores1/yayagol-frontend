@@ -1,39 +1,49 @@
-import { useState } from 'react';
-//import { useEffect, useState } from 'react';
-//import { getSSEUrl } from '../services/api';
-import { MatchScore } from '../types';
+import { useState, useEffect } from 'react';
+import { MatchScore, Match } from '../types';
 
-export const userLiveScores = () => {
-  const [liveScores] = useState<Map<number, MatchScore>>(new Map());
-  //const [liveScores, setLiveScores] = useState<Map<number, MatchScore>>(new Map());
+export const useLiveScores = (liveMatches: Match[]) => {
+  const [liveScores, setLiveScores] = useState<Map<number, MatchScore>>(new Map());
 
-//   useeffect(() => {
-//     const eventsource = new eventsource(getsseurl('https://api.yayagol.com/api/matches/live-stream'), {
-//       withcredentials: true,
-//     });
-//
-//     eventSource.onmessage = (event) => {
-//       try {
-//         const score: MatchScore = JSON.parse(event.data);
-//         setLiveScores((prev) => {
-//           const newScores = new Map(prev);
-//           newScores.set(score.matchId, score);
-//           return newScores;
-//         });
-//       } catch (error) {
-//         console.error('Error parsing SSE data:', error);
-//       }
-//     };
-//
-//     eventSource.onerror = (error) => {
-//       console.error('SSE connection error:', error);
-//       eventSource.close();
-//     };
-//
-//     return () => {
-//       eventSource.close();
-//     };
-//   }, []);
+  useEffect(() => {
+    if (liveMatches.length === 0) return;
+
+    // Open one SSE connection per live match
+    const sources = liveMatches.map(match => {
+      const source = new EventSource(
+        `http://localhost:8080/api/live/match/${match.matchId}`,
+        { withCredentials: true }
+      );
+
+      // Listen for goal events
+      source.addEventListener('goal', (e) => {
+        const data = JSON.parse(e.data);
+        setLiveScores(prev => {
+          const next = new Map(prev);
+          next.set(match.matchId, {
+            homeGoals: data.homeScore,
+            awayGoals: data.awayScore
+          });
+          return next;
+        });
+      });
+
+      // Close connection when match finishes
+      source.addEventListener('match_finished', () => {
+        source.close();
+      });
+
+      source.onerror = () => {
+        console.error(`SSE error for match ${match.matchId}`);
+        source.close();
+      };
+
+      return source;
+    });
+
+    // Cleanup all connections when leaving the page
+    return () => sources.forEach(s => s.close());
+
+  }, [liveMatches]);
 
   return liveScores;
 };

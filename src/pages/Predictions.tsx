@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { userLiveScores } from '../hooks/userLiveScores';
+import { useLiveScores } from '../hooks/userLiveScores';
 import api from '../services/api';
 import { Match } from '../types';
 
@@ -11,7 +11,11 @@ export default function Predictions() {
   const [predictions, setPredictions] = useState<Map<number, { homeGoals: string; awayGoals: string }>>(new Map());
   const [savedMatches, setSavedMatches] = useState<Set<number>>(new Set());
   const groupId = localStorage.getItem('selectedGroup');
-  const liveScores = userLiveScores(); // SSE!
+  const liveMatches = useMemo(
+    () => matches.filter(m => m.gameStatus === 'LIVE'),
+    [matches]
+  );
+  const liveScores = useLiveScores(liveMatches);
 
   const [dates, setDates] = useState<string[]>([]);
 
@@ -23,12 +27,17 @@ export default function Predictions() {
   }, []);
 
   useEffect(() => {
-      if(selectedDate) loadMatches();
+      if (selectedDate) loadMatches();
+
+      const interval = setInterval(() => {
+          if (selectedDate) loadMatches();
+      }, 30_000);
+
+      return () => clearInterval(interval);
   }, [selectedDate]);
 
   const loadMatches = async () => {
     try {
-      //const groupId = localStorage.getItem('selectedGroup');
       const response = await api.get(`/matches?date=${selectedDate}`);
       setMatches(response.data);
       await loadPredictions(response.data.map((m: Match) => m.matchId));
@@ -129,12 +138,22 @@ export default function Predictions() {
                 <div className="w-20 text-center"><p className="font-semibold">{match.awayTeam}</p></div>
                 <img src={match.awayTeamLogo} className="w-12 h-12 object-contain" />
               </div>
-              {liveScore && liveScore.homeGoals !== null && (
+
+              {/* Actual match score — live or finished */}
+              {(match.gameStatus === 'FINISHED' || match.gameStatus === 'LIVE') && (
                 <div className="text-center mb-2">
-                  <span className="text-sm">Live: </span>
-                  <span className="text-primary font-bold">{liveScore.homeGoals} - {liveScore.awayGoals}</span>
+                  <span className="text-xs text-gray-500">
+                    {match.gameStatus === 'LIVE' ? 'En vivo: ' : 'Resultado: '}
+                  </span>
+                  <span className="font-bold text-primary">
+                    {match.gameStatus === 'LIVE' && liveScore
+                      ? `${liveScore.homeGoals} - ${liveScore.awayGoals}`
+                      : `${match.matchScore?.homeGoals ?? '-'} - ${match.matchScore?.awayGoals ?? '-'}`
+                    }
+                  </span>
                 </div>
               )}
+
              <div className="text-center">
                {savedMatches.has(match.matchId) && (
                  <div className="flex items-center justify-center gap-1 text-green-600 text-xs mb-1 font-medium">

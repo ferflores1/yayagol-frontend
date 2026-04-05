@@ -18,29 +18,35 @@ export default function GroupPredictions() {
   }, []);
 
   useEffect(() => {
-    if (selectedDate) loadData();
-  }, [selectedDate]);
+      const loadData = async () => {
+          try {
+              if (!groupId) return;
+              const response = await api.get(`/group-predictions?date=${selectedDate}&groupId=${groupId}`);
+              setData(response.data);
+          } catch (error) {
+              console.error('Error:', error);
+          }
+      };
 
-  const loadData = async () => {
-      try {
-          if (!groupId) return; // no group selected, stop
-
-          // verify groupId belongs to current user
+      const validateAndLoad = async () => {
+          if (!groupId) return;
           const groupsRes = await api.get('/quiniela/my-groups');
           const belongsToUser = groupsRes.data.some((g: any) => g.id.toString() === groupId);
-
           if (!belongsToUser) {
-            localStorage.removeItem('selectedGroup');
-            return; // groupId is stale, stop
+              localStorage.removeItem('selectedGroup');
+              return;
           }
+          loadData();
+      };
 
-          const response = await api.get(`/group-predictions?date=${selectedDate}&groupId=${groupId}`);
-          setData(response.data);
-      }
-        catch (error) {
-            console.error('Error:', error);
-        }
-  };
+      if (selectedDate) validateAndLoad(); // validate once on load
+
+      const interval = setInterval(() => {
+          if (selectedDate) loadData(); // just fetch, no validation
+      }, 30_000);
+
+      return () => clearInterval(interval);
+  }, [selectedDate]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
