@@ -10,6 +10,7 @@ export default function Predictions() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<Map<number, { homeGoals: string; awayGoals: string }>>(new Map());
   const [savedMatches, setSavedMatches] = useState<Set<number>>(new Set());
+  const [disabledMatches, setDisabledMatches] = useState<Set<number>>(new Set());
   const groupId = localStorage.getItem('selectedGroup');
   const liveMatches = useMemo(
     () => matches.filter(m => m.gameStatus === 'LIVE'),
@@ -22,7 +23,9 @@ export default function Predictions() {
   useEffect(() => {
       api.get('/matches/dates').then(res => {
           setDates(res.data);
-          if (res.data.length > 0) setSelectedDate(res.data[0]);
+          const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Guatemala' });
+          const todayExists = res.data.find((d: string) => d === today);
+          setSelectedDate(todayExists ? today : res.data[0]);
       });
   }, []);
 
@@ -41,6 +44,11 @@ export default function Predictions() {
       const response = await api.get(`/matches?date=${selectedDate}`);
       setMatches(response.data);
       await loadPredictions(response.data.map((m: Match) => m.matchId));
+
+      // Fetch prediction-disabled matches
+      const disabledRes = await api.get(`/matches/pred-disabled?date=${selectedDate}`);
+      const disabledIds = new Set<number>(disabledRes.data.map((m: Match) => m.matchId));
+      setDisabledMatches(disabledIds);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -110,6 +118,7 @@ export default function Predictions() {
         {matches.map((match) => {
           const liveScore = liveScores.get(match.matchId);
           const pred = predictions.get(match.matchId) || { homeGoals: '', awayGoals: '' };
+          const isLocked = disabledMatches.has(match.matchId);
           return (
             <div key={match.matchId} className="bg-white p-6">
               <p className="text-center text-sm text-gray-600 mb-4">{new Date(match.kickoffTime).toLocaleString()}</p>
@@ -123,7 +132,8 @@ export default function Predictions() {
                     maxLength={2}
                     value={pred.homeGoals}
                     onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
-                    className="w-14 h-14 text-center text-xl border-2 rounded focus:border-primary"
+                    disabled={isLocked}
+                    className={`w-14 h-14 text-center text-xl border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
                   />
                   <span className="text-2xl text-gray-400">vs</span>
                   <input
@@ -132,7 +142,8 @@ export default function Predictions() {
                     maxLength={2}
                     value={pred.awayGoals}
                     onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
-                    className="w-14 h-14 text-center text-xl border-2 rounded focus:border-primary"
+                    disabled={isLocked}
+                    className={`w-14 h-14 text-center text-xl border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
                   />
                 </div>
                 <div className="w-20 text-center"><p className="font-semibold">{match.awayTeam}</p></div>
@@ -165,8 +176,8 @@ export default function Predictions() {
                </span>
                <button
                  onClick={() => savePrediction(match.matchId)}
-                 disabled={savedMatches.has(match.matchId)}
-                 className={`block mx-auto mt-2 text-sm ${savedMatches.has(match.matchId) ? 'text-gray-300' : 'text-primary'}`}
+                 disabled={savedMatches.has(match.matchId) || isLocked}
+                 className={`block mx-auto mt-2 text-sm ${savedMatches.has(match.matchId) || isLocked ? 'text-gray-300' : 'text-primary'}`}
                >
                  Guardar
                </button>

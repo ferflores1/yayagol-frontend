@@ -13,7 +13,9 @@ export default function GroupPredictions() {
  useEffect(() => {
       api.get('/matches/dates').then(res => {
           setDates(res.data);
-          if (res.data.length > 0) setSelectedDate(res.data[0]);
+          const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Guatemala' });
+          const todayExists = res.data.find((d: string) => d === today);
+          setSelectedDate(todayExists ? today : res.data[0]);
       });
   }, []);
 
