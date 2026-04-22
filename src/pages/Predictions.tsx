@@ -172,7 +172,7 @@ export default function Predictions() {
                  </div>
                )}
                <span className={`px-3 py-1 rounded text-xs ${match.gameStatus === 'LIVE' ? 'bg-red-100 text-red-700' : 'bg-gray-100'}`}>
-                 {match.gameStatus}
+                 {match.gameStatusLabel}
                </span>
                <button
                  onClick={() => savePrediction(match.matchId)}

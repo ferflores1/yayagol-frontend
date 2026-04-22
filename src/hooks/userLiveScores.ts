@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MatchScore, Match } from '../types';
+import { getSSEUrl } from '../services/api';
 
 export const useLiveScores = (liveMatches: Match[]) => {
   const [liveScores, setLiveScores] = useState<Map<number, MatchScore>>(new Map());
@@ -9,10 +10,8 @@ export const useLiveScores = (liveMatches: Match[]) => {
 
     // Open one SSE connection per live match
     const sources = liveMatches.map(match => {
-      const source = new EventSource(
-        `http://localhost:8080/api/live/match/${match.matchId}`,
-        { withCredentials: true }
-      );
+      const url = getSSEUrl(`/api/live/match/${match.matchId}`);
+      const source = new EventSource(url, { withCredentials: true });
 
       // Listen for goal events
       source.addEventListener('goal', (e) => {

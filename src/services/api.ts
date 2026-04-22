@@ -3,12 +3,14 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+const BASE_URL = API_URL.endsWith('/api')
+  ? API_URL.slice(0, -4)
+  : API_URL;
+
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.response.use(
@@ -22,7 +24,7 @@ api.interceptors.response.use(
 );
 
 export const logout = async () => {
-  await fetch(`/logout`, {
+  await fetch(`${BASE_URL}/logout`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -30,16 +32,13 @@ export const logout = async () => {
   window.location.href = '/login.html';
 };
 
-export default api;
-
 export const isAuthenticated = async () => {
-  const res = await fetch(`/api/auth/me`, {
-    credentials: "include"
+  const res = await fetch(`${API_URL}/auth/me`, {
+    credentials: 'include',
   });
   return res.ok;
 };
 
-export const getSSEUrl = (endpoint: string) => {
-  const baseUrl = API_URL.replace('/api', '');
-  return `${baseUrl}${endpoint}`;
-};
+export const getSSEUrl = (endpoint: string) => `${BASE_URL}${endpoint}`;
+
+export default api;

@@ -16,6 +16,7 @@ export interface Match {
   awayTeam: string;
   kickoffTime: string;
   gameStatus: 'SCHEDULED' | 'LIVE' | 'FINISHED';
+  gameStatusLabel: string;
   matchScore: MatchScore | null;
   homeTeamLogo: string;
   awayTeamLogo: string;
@@ -36,6 +37,7 @@ export interface ScorePrediction {
 export interface LeaderboardUser {
   name: string;
   points: number;
+  rank: number;
 }
 
 export interface GroupPrediction {

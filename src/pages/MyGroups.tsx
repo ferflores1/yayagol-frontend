@@ -71,7 +71,7 @@ export default function MyGroups() {
                 className="bg-white rounded-lg p-4 cursor-pointer transition border border-gray-200 hover:bg-green-50 hover:shadow-md"
               >
                 <h3 className="font-semibold text-lg">{g.name}</h3>
-                <p className="text-sm text-gray-600">Users: {g.users}</p>
+                <p className="text-sm text-gray-600">Participantes: {g.users}</p>
               </div>
             ))}
           </div>

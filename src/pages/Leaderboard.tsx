@@ -21,6 +21,14 @@ export default function Leaderboard() {
     }
   };
 
+  const rowColor = (rank: number, points: number) => {
+    if (points === 0) return 'bg-white';
+    if (rank === 1) return 'bg-yellow-50';
+    if (rank === 2) return 'bg-gray-100';
+    if (rank === 3) return 'bg-orange-50';
+    return 'bg-white';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <Header title="Tabla de Posiciones" />
@@ -36,10 +44,9 @@ export default function Leaderboard() {
             </thead>
             <tbody className="divide-y">
               {players.map((p, i) => {
-                const rank = i + 1;
                 return (
-                  <tr key={i}>
-                   <td className="px-6 py-4 font-bold text-gray-900">{rank}</td>
+                  <tr key={i} className={rowColor(p.rank, p.points)}>
+                   <td className="px-6 py-4 font-bold text-gray-900">{p.rank}</td>
                     <td className="px-6 py-4 font-medium">{p.name}</td>
                     <td className="px-6 py-4 text-right font-semibold">{p.points}</td>
                   </tr>
