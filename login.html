@@ -315,7 +315,7 @@
         </div>
 
         <div class="social-buttons">
-            <a href="http://localhost:8080/oauth2/authorization/google" class="google-btn">
+            <a href="https://api.yayagol.com/oauth2/authorization/google" class="google-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -325,7 +325,7 @@
                 Continuar con Google
             </a>
 
-            <a href="http://localhost:8080/oauth2/authorization/facebook" class="fb-btn">
+            <a href="https://api.yayagol.com/oauth2/authorization/facebook" class="fb-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                     <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.313 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
                 </svg>
@@ -359,6 +359,9 @@
         <p class="toggle-link" id="toggleText">
             ¿No tienes cuenta? <span onclick="toggleMode()">Regístrate</span>
         </p>
+        <p style="text-align: center; color: #9ca3af; font-size: 9px; padding-top: 16px;">
+            © 2026 Flow Brothers LLC. All rights reserved.
+        </p>
     </div>
 
     <div class="right-panel">
@@ -366,7 +369,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8080/api';
+        const API_URL = 'https://api.yayagol.com/api';
         let isRegisterMode = false;
 
         function toggleMode() {
@@ -417,8 +420,5 @@
             document.getElementById('errorMsg').classList.remove('show');
         }
     </script>
-    <p style="text-align: center; color: #9ca3af; font-size: 9px; padding-bottom: 4px;">
-        © 2026 Flow Brothers LLC. All rights reserved.
-    </p>
 </body>
 </html>
