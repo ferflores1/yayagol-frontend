@@ -122,12 +122,12 @@ export default function Predictions() {
           return (
             <div key={match.matchId} className="bg-white p-4">
               <p className="text-center text-sm text-gray-600 mb-4">{new Date(match.kickoffTime).toLocaleString()}</p>
-             <div className="grid grid-cols-3 items-center gap-2 mb-4">
-               <div className="flex flex-col items-center gap-1">
-                 <img src={match.homeTeamLogo} className="w-10 h-10 object-contain" />
-                 <p className="font-semibold text-xs text-center leading-tight">{match.homeTeam}</p>
+             <div className="grid grid-cols-3 items-center gap-2 mb-4 md:flex md:justify-center md:gap-6">
+               <div className="flex flex-col items-center gap-1 md:flex-row md:gap-2">
+                 <img src={match.homeTeamLogo} className="w-10 h-10 object-contain md:w-12 md:h-12" />
+                 <p className="font-semibold text-xs text-center leading-tight md:text-base md:w-20">{match.homeTeam}</p>
                </div>
-               <div className="flex items-center justify-center gap-1">
+               <div className="flex items-center justify-center gap-1 md:gap-3">
                  <input
                    type="text"
                    inputMode="numeric"
@@ -135,9 +135,9 @@ export default function Predictions() {
                    value={pred.homeGoals}
                    onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
                    disabled={isLocked}
-                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
+                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
                  />
-                 <span className="text-sm text-gray-400 font-bold">vs</span>
+                 <span className="text-sm text-gray-400 font-bold md:text-2xl">vs</span>
                  <input
                    type="text"
                    inputMode="numeric"
@@ -145,12 +145,12 @@ export default function Predictions() {
                    value={pred.awayGoals}
                    onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
                    disabled={isLocked}
-                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
+                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
                  />
                </div>
-               <div className="flex flex-col items-center gap-1">
-                 <img src={match.awayTeamLogo} className="w-10 h-10 object-contain" />
-                 <p className="font-semibold text-xs text-center leading-tight">{match.awayTeam}</p>
+               <div className="flex flex-col items-center gap-1 md:flex-row-reverse md:gap-2">
+                 <img src={match.awayTeamLogo} className="w-10 h-10 object-contain md:w-12 md:h-12" />
+                 <p className="font-semibold text-xs text-center leading-tight md:text-base md:w-20">{match.awayTeam}</p>
                </div>
              </div>
 
