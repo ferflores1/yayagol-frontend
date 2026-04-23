@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t z-50">
-      <div className="flex justify-around py-3">
+      <div className="flex justify-around py-2">
         <Link
           to="/predictions"
           className={`flex flex-col items-center gap-1 ${
@@ -14,13 +14,13 @@ export default function Footer() {
           }`}
         >
           <div
-            className={`w-10 h-10 rounded flex items-center justify-center text-sm font-bold ${
+            className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold ${
               isActive('/predictions') ? 'bg-primary text-white' : 'text-gray-400'
             }`}
           >
             1:2
           </div>
-          <span className="text-xs font-medium">Mis Predicciones</span>
+          <span className="text-xs font-medium">Predicciones</span>
         </Link>
 
         <Link
@@ -29,7 +29,7 @@ export default function Footer() {
             isActive('/group-predictions') ? 'text-primary' : 'text-gray-400'
           }`}
         >
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -37,7 +37,7 @@ export default function Footer() {
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
-          <span className="text-xs">Pronósticos del grupo</span>
+          <span className="text-xs">Pronósticos</span>
         </Link>
 
         <Link
@@ -46,7 +46,7 @@ export default function Footer() {
             isActive('/leaderboard') ? 'text-primary' : 'text-gray-400'
           }`}
         >
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -63,7 +63,7 @@ export default function Footer() {
             isActive('/profile') ? 'text-primary' : 'text-gray-400'
           }`}
         >
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -71,7 +71,7 @@ export default function Footer() {
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="text-xs">Mi Perfil</span>
+          <span className="text-xs">Perfil</span>
         </Link>
       </div>
     </nav>

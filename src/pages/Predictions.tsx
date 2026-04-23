@@ -120,35 +120,39 @@ export default function Predictions() {
           const pred = predictions.get(match.matchId) || { homeGoals: '', awayGoals: '' };
           const isLocked = disabledMatches.has(match.matchId);
           return (
-            <div key={match.matchId} className="bg-white p-6">
+            <div key={match.matchId} className="bg-white p-4">
               <p className="text-center text-sm text-gray-600 mb-4">{new Date(match.kickoffTime).toLocaleString()}</p>
-              <div className="flex items-center justify-center gap-6 mb-4">
-                <img src={match.homeTeamLogo} className="w-12 h-12 object-contain" />
-                <div className="w-20 text-center"><p className="font-semibold">{match.homeTeam}</p></div>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={2}
-                    value={pred.homeGoals}
-                    onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
-                    disabled={isLocked}
-                    className={`w-14 h-14 text-center text-xl border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
-                  />
-                  <span className="text-2xl text-gray-400">vs</span>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={2}
-                    value={pred.awayGoals}
-                    onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
-                    disabled={isLocked}
-                    className={`w-14 h-14 text-center text-xl border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
-                  />
-                </div>
-                <div className="w-20 text-center"><p className="font-semibold">{match.awayTeam}</p></div>
-                <img src={match.awayTeamLogo} className="w-12 h-12 object-contain" />
-              </div>
+             <div className="grid grid-cols-3 items-center gap-2 mb-4">
+               <div className="flex flex-col items-center gap-1">
+                 <img src={match.homeTeamLogo} className="w-10 h-10 object-contain" />
+                 <p className="font-semibold text-xs text-center leading-tight">{match.homeTeam}</p>
+               </div>
+               <div className="flex items-center justify-center gap-1">
+                 <input
+                   type="text"
+                   inputMode="numeric"
+                   maxLength={2}
+                   value={pred.homeGoals}
+                   onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
+                   disabled={isLocked}
+                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
+                 />
+                 <span className="text-sm text-gray-400 font-bold">vs</span>
+                 <input
+                   type="text"
+                   inputMode="numeric"
+                   maxLength={2}
+                   value={pred.awayGoals}
+                   onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
+                   disabled={isLocked}
+                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
+                 />
+               </div>
+               <div className="flex flex-col items-center gap-1">
+                 <img src={match.awayTeamLogo} className="w-10 h-10 object-contain" />
+                 <p className="font-semibold text-xs text-center leading-tight">{match.awayTeam}</p>
+               </div>
+             </div>
 
               {/* Actual match score — live or finished */}
               {(match.gameStatus === 'FINISHED' || match.gameStatus === 'LIVE') && (
