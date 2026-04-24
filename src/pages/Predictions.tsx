@@ -55,16 +55,25 @@ export default function Predictions() {
   };
 
   const loadPredictions = async (matchIds: number[]) => {
-    try {
-      const response = await api.get(`/predictions?matchIds=${matchIds.join(',')}&groupId=${groupId}`);
-      const map = new Map<number, { homeGoals: string; awayGoals: string }>();
-      response.data.forEach((p: any) => {
-        map.set(p.matchId, { homeGoals: p.homeGoals.toString(), awayGoals: p.awayGoals.toString() });
-      });
-      setPredictions(map);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+      try {
+        const response = await api.get(`/predictions?matchIds=${matchIds.join(',')}&groupId=${groupId}`);
+        const map = new Map<number, { homeGoals: string; awayGoals: string }>();
+        response.data.forEach((p: any) => {
+          map.set(p.matchId, { homeGoals: p.homeGoals.toString(), awayGoals: p.awayGoals.toString() });
+        });
+        // Merge: keep any locally typed values, only fill in from server if user hasn't typed
+        setPredictions(prev => {
+          const merged = new Map(map);
+          prev.forEach((val, matchId) => {
+            if (val.homeGoals !== '' || val.awayGoals !== '') {
+              merged.set(matchId, val);
+            }
+          });
+          return merged;
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
   };
 
   const savePrediction = async (matchId: number) => {
@@ -135,7 +144,7 @@ export default function Predictions() {
                    value={pred.homeGoals}
                    onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
                    disabled={isLocked}
-                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
+                   className={`w-10 h-10 text-center text-base border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
                  />
                  <span className="text-sm text-gray-400 font-bold md:text-2xl">vs</span>
                  <input
@@ -145,7 +154,7 @@ export default function Predictions() {
                    value={pred.awayGoals}
                    onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
                    disabled={isLocked}
-                   className={`w-10 h-10 text-center text-lg border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
+                   className={`w-10 h-10 text-center text-base border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
                  />
                </div>
                <div className="flex flex-col items-center gap-1 md:flex-row-reverse md:gap-2">

@@ -91,7 +91,7 @@ export default function MyGroups() {
                 placeholder="Codigo"
                 autoFocus
                 maxLength={10}
-                className="w-36 px-3 py-2 border-2 border-gray-300 rounded focus:border-primary focus:outline-none text-sm tracking-widest font-mono text-center"
+                className="w-36 px-3 py-2 border-2 border-gray-300 rounded focus:border-primary focus:outline-none text-base tracking-widest font-mono text-center"
               />
               <button
                 onClick={joinGroup}
