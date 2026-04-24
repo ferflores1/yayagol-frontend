@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { useLiveScores } from '../hooks/userLiveScores';
 import api from '../services/api';
 import { Match } from '../types';
 
 export default function Predictions() {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState('');
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<Map<number, { homeGoals: string; awayGoals: string }>>(new Map());
@@ -105,6 +107,15 @@ export default function Predictions() {
       <header style={{ background: '#184A42' }}>
         <div className="max-w-2xl mx-auto px-5 pt-6 pb-10 flex items-start justify-between">
           <div>
+            <button
+              onClick={() => navigate('/my-groups')}
+              className="mb-3 rounded-full p-2.5 bg-white/[0.12] flex items-center justify-center"
+              aria-label="Back"
+            >
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
             <p
               className="text-xs font-bold tracking-[0.18em] uppercase mb-1"
               style={{ color: 'rgba(255,255,255,0.45)' }}

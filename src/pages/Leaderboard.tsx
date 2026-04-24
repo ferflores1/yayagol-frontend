@@ -8,7 +8,7 @@ import { LeaderboardUser } from '../types';
 const ScoringPanel = () => (
   <div className="md:w-48 md:shrink-0">
     <div className="bg-gray-900 rounded-xl overflow-hidden shadow-md md:sticky md:top-6">
-      <div className="hidden md:block bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3">
+      <div className="hidden md:block bg-gradient-to-r from-[#de2c4c] to-[#7a1c2f] px-4 py-3">
         <p className="text-white/70 text-[10px] font-semibold uppercase tracking-widest">Sistema de</p>
         <p className="text-white text-sm font-bold">Puntuación</p>
       </div>
@@ -98,7 +98,7 @@ export default function Leaderboard() {
 
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1 h-4 bg-[#DE2C4C] rounded-full" />
-              <span className="text-[10px] font-bold tracking-[.15em] uppercase text-[rgba(24,74,66,0.55)]">
+              <span className="text-[11px] md:text-[12px] font-bold tracking-[.15em] uppercase text-[rgba(24,74,66,0.55)]">
                 Clasificación
               </span>
             </div>
@@ -107,25 +107,28 @@ export default function Leaderboard() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-[#184A42]">
-                    <th className="w-10 px-4 py-3 text-left text-[10px] font-bold tracking-[.12em] uppercase text-white/55">#</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-bold tracking-[.12em] uppercase text-white/55">Jugador</th>
-                    <th className="px-4 py-3 text-right text-[10px] font-bold tracking-[.12em] uppercase text-white/55">Puntos</th>
+                    <th className="w-10 px-4 py-3 text-left text-[11px] md:text-[12px] font-bold tracking-[.12em] uppercase text-white/55">#</th>
+                    <th className="px-4 py-3 text-left text-[11px] md:text-[12px] font-bold tracking-[.12em] uppercase text-white/55">Jugador</th>
+                    <th className="px-4 py-3 text-right text-[11px] md:text-[12px] font-bold tracking-[.12em] uppercase text-white/55">Puntos</th>
                   </tr>
                 </thead>
                 <tbody>
                   {players.map((p) => (
-                    <tr key={p.rank} className={`border-b-[1.5px] border-[#F5FAF9] last:border-b-0 ${rowStyle[p.rank] ?? 'bg-white'}`}>
-                      <td className={`px-4 py-4 text-[13px] font-black ${rankNumStyle[p.rank] ?? 'text-[rgba(24,74,66,0.3)]'}`}>
+                    <tr
+                      key={p.rank}
+                      className={`border-b-[1.5px] border-[#F5FAF9] last:border-b-0 ${rowStyle[p.rank] ?? 'bg-white'}`}
+                    >
+                      <td className={`px-4 py-4 md:py-5 text-[14px] md:text-[16px] font-black ${rankNumStyle[p.rank] ?? 'text-[rgba(24,74,66,0.3)]'}`}>
                         {p.rank}
                       </td>
-                      <td className="px-4 py-4 text-[14px] font-bold text-[#184A42]">
+                      <td className="px-4 py-4 md:py-5 text-[15px] md:text-[17px] font-bold text-[#184A42]">
                         {p.name}
                       </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className={`text-[15px] font-black ${p.rank === 1 ? 'text-[#F0B429]' : 'text-[rgba(24,74,66,0.55)]'}`}>
+                      <td className="px-4 py-4 md:py-5 text-right">
+                        <span className={`text-[16px] md:text-[18px] font-black ${p.rank === 1 ? 'text-[#F0B429]' : 'text-[rgba(24,74,66,0.55)]'}`}>
                           {p.points}
                         </span>
-                        <span className="text-[9px] font-bold tracking-[.1em] uppercase text-[rgba(24,74,66,0.35)] ml-0.5">
+                        <span className="text-[10px] md:text-[11px] font-bold tracking-[.1em] uppercase text-[rgba(24,74,66,0.35)] ml-0.5">
                           pts
                         </span>
                       </td>

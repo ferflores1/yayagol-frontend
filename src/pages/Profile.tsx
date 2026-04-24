@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import api, { logout } from '../services/api';
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [saved, setSaved] = useState(false);
@@ -31,6 +33,15 @@ export default function Profile() {
 
       {/* Header */}
       <div className="bg-[#184A42] px-4 pt-5 pb-14">
+        <button
+          onClick={() => navigate('/my-groups')}
+          className="mb-3 rounded-full p-2.5 bg-white/[0.12] flex items-center justify-center"
+          aria-label="Back"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
         <p className="text-[10px] font-bold tracking-[.18em] uppercase text-white/45 mb-1">
           Quiniela Yayagol
         </p>

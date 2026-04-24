@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import api from '../services/api';
 
 export default function GroupPredictions() {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState('');
   const [data, setData] = useState<any>({ users: [], matches: [] });
   const groupId = localStorage.getItem('selectedGroup');
@@ -43,8 +45,18 @@ export default function GroupPredictions() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
+
       {/* Header */}
       <div className="bg-[#184A42] px-4 pt-5 pb-8">
+        <button
+          onClick={() => navigate('/my-groups')}
+          className="mb-3 rounded-full p-2.5 bg-white/[0.12] flex items-center justify-center"
+          aria-label="Back"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
         <p className="text-[10px] font-bold tracking-[.18em] uppercase text-white/45 mb-1">
           Quiniela Yayagol
         </p>
@@ -114,7 +126,12 @@ export default function GroupPredictions() {
             </tbody>
           </table>
         </div>
+
       </div>
+
+      <p className="text-[11px] font-medium text-[rgba(24,74,66,0.45)] px-4 py-3">
+        * Los resultados de los demás participantes aparecen al momento del inicio de los partidos.
+      </p>
 
       <Footer />
     </div>
