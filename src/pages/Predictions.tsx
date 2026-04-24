@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useLiveScores } from '../hooks/userLiveScores';
 import api from '../services/api';
@@ -12,31 +11,25 @@ export default function Predictions() {
   const [savedMatches, setSavedMatches] = useState<Set<number>>(new Set());
   const [disabledMatches, setDisabledMatches] = useState<Set<number>>(new Set());
   const groupId = localStorage.getItem('selectedGroup');
-  const liveMatches = useMemo(
-    () => matches.filter(m => m.gameStatus === 'LIVE'),
-    [matches]
-  );
+  const liveMatches = useMemo(() => matches.filter(m => m.gameStatus === 'LIVE'), [matches]);
   const liveScores = useLiveScores(liveMatches);
-
   const [dates, setDates] = useState<string[]>([]);
 
   useEffect(() => {
-      api.get('/matches/dates').then(res => {
-          setDates(res.data);
-          const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Guatemala' });
-          const todayExists = res.data.find((d: string) => d === today);
-          setSelectedDate(todayExists ? today : res.data[0]);
-      });
+    api.get('/matches/dates').then(res => {
+      setDates(res.data);
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Guatemala' });
+      const todayExists = res.data.find((d: string) => d === today);
+      setSelectedDate(todayExists ? today : res.data[0]);
+    });
   }, []);
 
   useEffect(() => {
+    if (selectedDate) loadMatches();
+    const interval = setInterval(() => {
       if (selectedDate) loadMatches();
-
-      const interval = setInterval(() => {
-          if (selectedDate) loadMatches();
-      }, 30_000);
-
-      return () => clearInterval(interval);
+    }, 30_000);
+    return () => clearInterval(interval);
   }, [selectedDate]);
 
   const loadMatches = async () => {
@@ -44,8 +37,6 @@ export default function Predictions() {
       const response = await api.get(`/matches?date=${selectedDate}`);
       setMatches(response.data);
       await loadPredictions(response.data.map((m: Match) => m.matchId));
-
-      // Fetch prediction-disabled matches
       const disabledRes = await api.get(`/matches/pred-disabled?date=${selectedDate}`);
       const disabledIds = new Set<number>(disabledRes.data.map((m: Match) => m.matchId));
       setDisabledMatches(disabledIds);
@@ -55,25 +46,22 @@ export default function Predictions() {
   };
 
   const loadPredictions = async (matchIds: number[]) => {
-      try {
-        const response = await api.get(`/predictions?matchIds=${matchIds.join(',')}&groupId=${groupId}`);
-        const map = new Map<number, { homeGoals: string; awayGoals: string }>();
-        response.data.forEach((p: any) => {
-          map.set(p.matchId, { homeGoals: p.homeGoals.toString(), awayGoals: p.awayGoals.toString() });
+    try {
+      const response = await api.get(`/predictions?matchIds=${matchIds.join(',')}&groupId=${groupId}`);
+      const map = new Map<number, { homeGoals: string; awayGoals: string }>();
+      response.data.forEach((p: any) => {
+        map.set(p.matchId, { homeGoals: p.homeGoals.toString(), awayGoals: p.awayGoals.toString() });
+      });
+      setPredictions(prev => {
+        const merged = new Map(map);
+        prev.forEach((val, matchId) => {
+          if (val.homeGoals !== '' || val.awayGoals !== '') merged.set(matchId, val);
         });
-        // Merge: keep any locally typed values, only fill in from server if user hasn't typed
-        setPredictions(prev => {
-          const merged = new Map(map);
-          prev.forEach((val, matchId) => {
-            if (val.homeGoals !== '' || val.awayGoals !== '') {
-              merged.set(matchId, val);
-            }
-          });
-          return merged;
-        });
-      } catch (error) {
-        console.error('Error:', error);
-      }
+        return merged;
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const savePrediction = async (matchId: number) => {
@@ -87,7 +75,7 @@ export default function Predictions() {
         matchId,
         homeGoals: parseInt(pred.homeGoals),
         awayGoals: parseInt(pred.awayGoals),
-        groupId: groupId ? parseInt(groupId) : null
+        groupId: groupId ? parseInt(groupId) : null,
       });
       setSavedMatches(prev => new Set(prev).add(matchId));
     } catch (error) {
@@ -99,106 +87,224 @@ export default function Predictions() {
     const current = predictions.get(matchId) || { homeGoals: '', awayGoals: '' };
     setPredictions(new Map(predictions.set(matchId, { ...current, [field]: value })));
     setSavedMatches(prev => {
-        const next = new Set(prev);
-        next.delete(matchId);
-        return next;
-      });
+      const next = new Set(prev);
+      next.delete(matchId);
+      return next;
+    });
   };
 
+  const formatDate = (date: string) =>
+    new Date(date + 'T12:00:00').toLocaleDateString('es', {
+      weekday: 'short', day: 'numeric', month: 'short',
+    });
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-28">
-      <Header title="Mis Predicciones" />
-      <div className="bg-green-50 border-b border-green-100 sticky top-16">
-        <div className="flex overflow-x-auto">
-          {dates.map((date) => (
-            <button
-              key={date}
-              onClick={() => setSelectedDate(date)}
-              className={`px-4 py-3 text-sm whitespace-nowrap ${
-                date === selectedDate ? 'border-b-2 border-primary text-primary font-medium' : 'text-gray-500 hover:text-primary'
-              }`}
+    <div className="min-h-screen pb-28" style={{ background: '#ffffff' }}>
+
+      {/* ── Header ── */}
+      <header style={{ background: '#184A42' }}>
+        <div className="max-w-2xl mx-auto px-5 pt-6 pb-10 flex items-start justify-between">
+          <div>
+            <p
+              className="text-xs font-bold tracking-[0.18em] uppercase mb-1"
+              style={{ color: 'rgba(255,255,255,0.45)' }}
             >
-              {new Date(date + 'T12:00:00').toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short' })}
-            </button>
-          ))}
+              Quiniela Yayagol - Mundial 2026
+            </p>
+            <h1 className="text-3xl font-black text-white tracking-tight">Mis Predicciones</h1>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Date tabs overlapping header ── */}
+      <div
+        className="sticky top-0 z-10 -mt-5 mx-4 max-w-2xl md:mx-auto rounded-2xl overflow-hidden shadow-sm"
+        style={{ background: '#ffffff', border: '1px solid #E8F2F0' }}
+      >
+        <div className="flex overflow-x-auto scrollbar-hide">
+          {dates.map((date) => {
+            const isActive = date === selectedDate;
+            return (
+              <button
+                key={date}
+                onClick={() => setSelectedDate(date)}
+                className="px-4 py-3 text-sm whitespace-nowrap font-semibold transition shrink-0"
+                style={{
+                  color: isActive ? '#184A42' : 'rgba(24,74,66,0.4)',
+                  borderBottom: isActive ? '2.5px solid #184A42' : '2.5px solid transparent',
+                  background: 'transparent',
+                }}
+              >
+                {formatDate(date)}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <main className="divide-y">
+
+      {/* ── Match cards ── */}
+      <main className="max-w-2xl mx-auto px-4 pt-4 space-y-3">
+
+        {/* Section label */}
+        <div className="flex items-center gap-2.5 px-1 mt-1">
+          <div className="w-1 h-4 rounded-full shrink-0" style={{ background: '#DE2C4C' }} />
+          <p className="text-xs font-bold tracking-[0.15em] uppercase" style={{ color: '#184A42', opacity: 0.55 }}>
+            Partidos del día
+          </p>
+        </div>
+
         {matches.map((match) => {
           const liveScore = liveScores.get(match.matchId);
           const pred = predictions.get(match.matchId) || { homeGoals: '', awayGoals: '' };
           const isLocked = disabledMatches.has(match.matchId);
+          const isSaved = savedMatches.has(match.matchId);
+          const isLive = match.gameStatus === 'LIVE';
+          const isFinished = match.gameStatus === 'FINISHED';
+
           return (
-            <div key={match.matchId} className="bg-white p-4">
-              <p className="text-center text-sm text-gray-600 mb-4">{new Date(match.kickoffTime).toLocaleString()}</p>
-             <div className="grid grid-cols-3 items-center gap-2 mb-4 md:flex md:justify-center md:gap-6">
-               <div className="flex flex-col items-center gap-1 md:flex-row md:gap-2">
-                 <img src={match.homeTeamLogo} className="w-10 h-10 object-contain md:w-12 md:h-12" />
-                 <p className="font-semibold text-xs text-center leading-tight md:text-base md:w-20">{match.homeTeam}</p>
-               </div>
-               <div className="flex items-center justify-center gap-1 md:gap-3">
-                 <input
-                   type="text"
-                   inputMode="numeric"
-                   maxLength={2}
-                   value={pred.homeGoals}
-                   onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
-                   disabled={isLocked}
-                   className={`w-10 h-10 text-center text-base border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
-                 />
-                 <span className="text-sm text-gray-400 font-bold md:text-2xl">vs</span>
-                 <input
-                   type="text"
-                   inputMode="numeric"
-                   maxLength={2}
-                   value={pred.awayGoals}
-                   onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
-                   disabled={isLocked}
-                   className={`w-10 h-10 text-center text-base border-2 rounded focus:border-primary md:w-14 md:h-14 md:text-xl ${isLocked ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : ''}`}
-                 />
-               </div>
-               <div className="flex flex-col items-center gap-1 md:flex-row-reverse md:gap-2">
-                 <img src={match.awayTeamLogo} className="w-10 h-10 object-contain md:w-12 md:h-12" />
-                 <p className="font-semibold text-xs text-center leading-tight md:text-base md:w-20">{match.awayTeam}</p>
-               </div>
-             </div>
+            <div
+              key={match.matchId}
+              className="rounded-2xl transition"
+              style={{
+                background: '#ffffff',
+                border: `1.5px solid ${isLive ? '#DE2C4C' : '#E8F2F0'}`,
+                boxShadow: isLive
+                  ? '0 2px 12px rgba(222,44,76,0.08)'
+                  : '0 1px 4px rgba(0,0,0,0.04)',
+              }}
+            >
+              {/* Card top bar: time + status */}
+              <div
+                className="flex items-center justify-between px-4 py-2.5 rounded-t-2xl"
+                style={{ background: isLive ? 'rgba(222,44,76,0.05)' : '#F5FAF9', borderBottom: '1px solid #E8F2F0' }}
+              >
+                <p className="text-xs font-semibold" style={{ color: '#184A42', opacity: 0.6 }}>
+                  {new Date(match.kickoffTime).toLocaleString('es', {
+                    weekday: 'short', hour: '2-digit', minute: '2-digit',
+                  })}
+                </p>
+                <span
+                  className="text-xs font-bold px-2.5 py-0.5 rounded-full"
+                  style={{
+                    background: isLive ? 'rgba(222,44,76,0.1)' : '#E8F2F0',
+                    color: isLive ? '#DE2C4C' : '#184A42',
+                  }}
+                >
+                  {isLive && <span className="mr-1">●</span>}
+                  {match.gameStatusLabel}
+                </span>
+              </div>
 
-              {/* Actual match score — live or finished */}
-              {(match.gameStatus === 'FINISHED' || match.gameStatus === 'LIVE') && (
-                <div className="text-center mb-2">
-                  <span className="text-xs text-gray-500">
-                    {match.gameStatus === 'LIVE' ? 'En vivo: ' : 'Resultado: '}
-                  </span>
-                  <span className="font-bold text-primary">
-                    {match.gameStatus === 'LIVE' && liveScore
-                      ? `${liveScore.homeGoals} - ${liveScore.awayGoals}`
-                      : `${match.matchScore?.homeGoals ?? '-'} - ${match.matchScore?.awayGoals ?? '-'}`
-                    }
-                  </span>
+              {/* Match row */}
+              <div className="px-4 py-4">
+                <div className="grid grid-cols-3 items-center gap-3">
+
+                  {/* Home team */}
+                  <div className="flex flex-col items-center gap-1.5">
+                    <img src={match.homeTeamLogo} className="w-10 h-10 object-contain" />
+                    <p className="font-bold text-xs text-center leading-tight" style={{ color: '#111' }}>
+                      {match.homeTeam}
+                    </p>
+                  </div>
+
+                  {/* Score inputs */}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={2}
+                        value={pred.homeGoals}
+                        onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
+                        disabled={isLocked}
+                        className="w-11 h-11 text-center text-lg font-black rounded-xl outline-none transition"
+                        style={{
+                          border: `2px solid ${isLocked ? '#E8F2F0' : '#184A42'}`,
+                          color: isLocked ? '#aaa' : '#184A42',
+                          background: isLocked ? '#F5FAF9' : '#ffffff',
+                        }}
+                      />
+                      <span className="text-xs font-bold" style={{ color: 'rgba(24,74,66,0.35)' }}>vs</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={2}
+                        value={pred.awayGoals}
+                        onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
+                        disabled={isLocked}
+                        className="w-11 h-11 text-center text-lg font-black rounded-xl outline-none transition"
+                        style={{
+                          border: `2px solid ${isLocked ? '#E8F2F0' : '#184A42'}`,
+                          color: isLocked ? '#aaa' : '#184A42',
+                          background: isLocked ? '#F5FAF9' : '#ffffff',
+                        }}
+                      />
+                    </div>
+
+                    {/* Live / finished actual score */}
+                    {(isFinished || isLive) && (
+                      <div
+                        className="text-xs font-bold px-3 py-0.5 rounded-full"
+                        style={{
+                          background: isLive ? 'rgba(222,44,76,0.08)' : '#E8F2F0',
+                          color: isLive ? '#DE2C4C' : '#184A42',
+                        }}
+                      >
+                        {isLive && liveScore
+                          ? `${liveScore.homeGoals} - ${liveScore.awayGoals}`
+                          : `${match.matchScore?.homeGoals ?? '-'} - ${match.matchScore?.awayGoals ?? '-'}`}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Away team */}
+                  <div className="flex flex-col items-center gap-1.5">
+                    <img src={match.awayTeamLogo} className="w-10 h-10 object-contain" />
+                    <p className="font-bold text-xs text-center leading-tight" style={{ color: '#111' }}>
+                      {match.awayTeam}
+                    </p>
+                  </div>
                 </div>
-              )}
+              </div>
 
-             <div className="text-center">
-               {savedMatches.has(match.matchId) && (
-                 <div className="flex items-center justify-center gap-1 text-green-600 text-xs mb-1 font-medium">
-                   <span>✓ Prediccion guardada</span>
-                 </div>
-               )}
-               <span className={`px-3 py-1 rounded text-xs ${match.gameStatus === 'LIVE' ? 'bg-red-100 text-red-700' : 'bg-gray-100'}`}>
-                 {match.gameStatusLabel}
-               </span>
-               <button
-                 onClick={() => savePrediction(match.matchId)}
-                 disabled={savedMatches.has(match.matchId) || isLocked}
-                 className={`block mx-auto mt-2 text-sm ${savedMatches.has(match.matchId) || isLocked ? 'text-gray-300' : 'text-primary'}`}
-               >
-                 Guardar
-               </button>
-             </div>
+              {/* Card footer: save action */}
+              <div
+                className="flex items-center justify-between px-4 py-2.5 rounded-b-2xl"
+                style={{ borderTop: '1px solid #E8F2F0' }}
+              >
+                {isSaved ? (
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-white"
+                      style={{ background: '#184A42' }}
+                    >
+                      ✓
+                    </span>
+                    <span className="text-xs font-semibold" style={{ color: '#184A42' }}>
+                      Predicción guardada
+                    </span>
+                  </div>
+                ) : (
+                  <span />
+                )}
+
+                <button
+                  onClick={() => savePrediction(match.matchId)}
+                  disabled={isSaved || isLocked}
+                  className="px-5 py-1.5 rounded-full text-sm font-bold transition active:scale-95 disabled:opacity-30"
+                  style={{
+                    background: isSaved || isLocked ? '#E8F2F0' : '#F0B429',
+                    color: isSaved || isLocked ? '#184A42' : '#ffffff',
+                  }}
+                >
+                  {isSaved ? 'Guardado' : 'Guardar'}
+                </button>
+              </div>
             </div>
           );
         })}
       </main>
+
       <Footer />
     </div>
   );
