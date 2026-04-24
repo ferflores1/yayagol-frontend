@@ -106,7 +106,7 @@ export default function Predictions() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-28">
       <Header title="Mis Predicciones" />
       <div className="bg-green-50 border-b border-green-100 sticky top-16">
         <div className="flex overflow-x-auto">
