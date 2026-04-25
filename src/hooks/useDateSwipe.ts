@@ -39,7 +39,7 @@ export function useDateSwipe({
   useEffect(() => {
     if (!tabBarRef.current || !selectedDate) return;
     const activeBtn = tabBarRef.current.querySelector<HTMLElement>('[data-active="true"]');
-    activeBtn?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    activeBtn?.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' });
   }, [selectedDate, tabBarRef]);
 
   useEffect(() => {

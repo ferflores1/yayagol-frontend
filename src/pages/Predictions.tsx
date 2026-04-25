@@ -135,7 +135,7 @@ export default function Predictions() {
         className="sticky top-0 z-10 -mt-5 mx-4 max-w-2xl md:mx-auto rounded-2xl overflow-hidden shadow-sm"
         style={{ background: '#ffffff', border: '1px solid #E8F2F0' }}
       >
-        <div ref={tabBarRef} className="flex overflow-x-auto scrollbar-hide">
+        <div ref={tabBarRef} className="flex overflow-x-auto scrollbar-hide" style={{ touchAction: 'pan-x' }}>
           {dates.map((date) => {
             const isActive = date === selectedDate;
             return (

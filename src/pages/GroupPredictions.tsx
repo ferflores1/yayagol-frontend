@@ -153,7 +153,7 @@ export default function GroupPredictions() {
       <div className="bg-white rounded-t-[20px] -mt-3">
 
         {/* Date tabs */}
-        <div ref={tabBarRef} className="overflow-x-auto border-b-[1.5px] border-[#E8F2F0] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={tabBarRef} className="overflow-x-auto border-b-[1.5px] border-[#E8F2F0] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ touchAction: 'pan-x' }}>
           <div className="flex whitespace-nowrap px-1">
             {dates.map((date) => (
               <button
