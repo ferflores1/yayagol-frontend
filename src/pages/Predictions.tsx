@@ -69,7 +69,7 @@ export default function Predictions() {
   const savePrediction = async (matchId: number) => {
     const pred = predictions.get(matchId);
     if (!pred?.homeGoals || !pred?.awayGoals) {
-      alert('Enter both scores');
+      alert('Ingresa goles de ambos equipos.');
       return;
     }
     try {
