@@ -31,10 +31,10 @@ function getPredictionColor(pred: UserPrediction, match: MatchColumn): Predictio
   const active = match.gameStatus === 'LIVE' || match.gameStatus === 'FINISHED';
   if (!active || match.score1 === null || match.score2 === null) return 'gray';
   if (pred.score1 === null || pred.score2 === null) return 'gray';
-  if (pred.score1 === match.score1 && pred.score2 === match.score2) return 'gold';
+  if (pred.score1 === match.score1 && pred.score2 === match.score2) return 'green';
   const predResult = Math.sign(pred.score1 - pred.score2);
   const actualResult = Math.sign(match.score1 - match.score2);
-  if (predResult === actualResult) return 'green';
+  if (predResult === actualResult) return 'gold';
   return 'gray';
 }
 

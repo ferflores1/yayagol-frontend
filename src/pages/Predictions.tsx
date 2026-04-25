@@ -12,7 +12,7 @@ export default function Predictions() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [predictions, setPredictions] = useState<Map<number, { homeGoals: string; awayGoals: string }>>(new Map());
   const [savedMatches, setSavedMatches] = useState<Set<number>>(new Set());
-  const [disabledMatches, setDisabledMatches] = useState<Set<number>>(new Set());
+  const [disabledMatches, setDisabledMatches] = useState<Set<number> | null>(null);
   const groupId = localStorage.getItem('selectedGroup');
   const liveMatches = useMemo(() => matches.filter(m => m.gameStatus === 'LIVE'), [matches]);
   const liveScores = useLiveScores(liveMatches);
@@ -168,7 +168,7 @@ export default function Predictions() {
           </p>
         </div>
 
-        {matches.map((match) => {
+        {disabledMatches === null ? null : matches.map((match) => {
           const liveScore = liveScores.get(match.matchId);
           const pred = predictions.get(match.matchId) || { homeGoals: '', awayGoals: '' };
           const isLocked = disabledMatches.has(match.matchId);
