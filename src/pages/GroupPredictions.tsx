@@ -1,14 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useDateSwipe } from '../hooks/useDateSwipe';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import api from '../services/api';
 
+type MatchColumn = {
+  id: number;
+  team1: string;
+  team2: string;
+  gameStatus: string;   // "SCHEDULED" | "LIVE" | "FINISHED"
+  score1: number | null;
+  score2: number | null;
+};
+
+type UserPrediction = { score1: number; score2: number };
+type UserRow = { id: number; name: string; predictions: Record<number, UserPrediction> };
+
+type PredictionColor = 'gold' | 'green' | 'gray';
+
+function getPredictionColor(
+  pred: UserPrediction,
+  match: MatchColumn
+): PredictionColor {
+  const active = match.gameStatus === 'LIVE' || match.gameStatus === 'FINISHED';
+  if (!active || match.score1 === null || match.score2 === null) return 'gray';
+
+  // Gold — exact score
+  if (pred.score1 === match.score1 && pred.score2 === match.score2) return 'gold';
+
+  // Green — correct result (win / draw / loss)
+  const predResult = Math.sign(pred.score1 - pred.score2);
+  const actualResult = Math.sign(match.score1 - match.score2);
+  if (predResult === actualResult) return 'green';
+
+  return 'gray';
+}
+
+const PILL_STYLES: Record<PredictionColor, { background: string; color: string }> = {
+  gold:  { background: '#FFF3CD', color: '#9A6700' },
+  green: { background: '#D1FAE5', color: '#065F46' },
+  gray:  { background: '#E8F2F0', color: '#184A42' },
+};
+
 export default function GroupPredictions() {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState('');
-  const [data, setData] = useState<any>({ users: [], matches: [] });
+  const [data, setData] = useState<{ groupName?: string; users: UserRow[]; matches: MatchColumn[] }>({
+    users: [],
+    matches: [],
+  });
   const groupId = localStorage.getItem('selectedGroup');
   const [dates, setDates] = useState<string[]>([]);
+  const tabBarRef = useRef<HTMLDivElement>(null);
+  const pageRef = useDateSwipe({ dates, selectedDate, setSelectedDate, tabBarRef });
 
   useEffect(() => {
     api.get('/matches/dates').then(res => {
@@ -44,7 +88,7 @@ export default function GroupPredictions() {
   }, [selectedDate]);
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div ref={pageRef} className="min-h-screen bg-white pb-20">
 
       {/* Header */}
       <div className="bg-[#184A42] px-4 pt-5 pb-8">
@@ -67,12 +111,13 @@ export default function GroupPredictions() {
       <div className="bg-white rounded-t-[20px] -mt-3">
 
         {/* Date tabs */}
-        <div className="overflow-x-auto border-b-[1.5px] border-[#E8F2F0] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={tabBarRef} className="overflow-x-auto border-b-[1.5px] border-[#E8F2F0] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex whitespace-nowrap px-1">
             {dates.map((date) => (
               <button
                 key={date}
                 onClick={() => setSelectedDate(date)}
+                data-active={date === selectedDate}
                 className={`px-3 py-2.5 text-[11px] font-bold tracking-[.05em] uppercase border-b-2 transition-all ${
                   date === selectedDate
                     ? 'text-[#184A42] border-[#DE2C4C]'
@@ -95,29 +140,49 @@ export default function GroupPredictions() {
                 <th className="sticky left-0 z-[3] bg-[#184A42] text-left px-4 py-2.5 text-[10px] font-bold tracking-[.08em] uppercase text-white/55 min-w-[100px]">
                   Jugador
                 </th>
-                {data.matches.map((m: any) => (
-                  <th key={m.id} className="bg-[#184A42] px-2.5 py-2.5 text-[10px] font-bold tracking-[.08em] uppercase text-white/60 min-w-[76px]">
-                    {m.team1} vs {m.team2}
+                {data.matches.map((m) => (
+                  <th key={m.id} className="bg-[#184A42] px-2.5 py-2.5 min-w-[76px]">
+                    <div className="text-[10px] font-bold tracking-[.08em] uppercase text-white/60">
+                      {m.team1} vs {m.team2}
+                    </div>
+                    {/* Show live/final score in header when available */}
+                    {(m.gameStatus === 'LIVE' || m.gameStatus === 'FINISHED') &&
+                      m.score1 !== null && m.score2 !== null && (
+                      <div className={`mt-1 text-[11px] font-black ${
+                        m.gameStatus === 'LIVE' ? 'text-[#DE2C4C]' : 'text-white/80'
+                      }`}>
+                        {m.score1}–{m.score2}
+                        {m.gameStatus === 'LIVE' && (
+                          <span className="ml-1 text-[9px] font-bold opacity-70">EN VIVO</span>
+                        )}
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {data.users.map((user: any) => (
+              {data.users.map((user) => (
                 <tr key={user.id} className="group">
                   <td className="sticky left-0 z-[2] bg-white group-hover:bg-[#F5FAF9] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[13px] font-bold text-[#184A42] transition-colors">
                     {user.name}
                   </td>
-                  {data.matches.map((m: any) => {
+                  {data.matches.map((m) => {
                     const pred = user.predictions?.[m.id];
+                    const color = pred ? getPredictionColor(pred, m) : 'gray';
+                    const style = PILL_STYLES[color];
                     return (
                       <td key={m.id} className="border-b-[1.5px] border-[#F5FAF9] px-2.5 py-2.5 text-center bg-white group-hover:bg-[#FAFCFC] transition-colors">
-                        {pred
-                          ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-extrabold tracking-[.04em] bg-[#E8F2F0] text-[#184A42]">
-                              {pred.score1}–{pred.score2}
-                            </span>
-                          : <span className="text-[rgba(24,74,66,0.25)] text-base font-bold">—</span>
-                        }
+                        {pred ? (
+                          <span
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-extrabold tracking-[.04em]"
+                            style={style}
+                          >
+                            {pred.score1}–{pred.score2}
+                          </span>
+                        ) : (
+                          <span className="text-[rgba(24,74,66,0.25)] text-base font-bold">—</span>
+                        )}
                       </td>
                     );
                   })}

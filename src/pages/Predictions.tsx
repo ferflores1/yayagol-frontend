@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useDateSwipe } from '../hooks/useDateSwipe';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { useLiveScores } from '../hooks/userLiveScores';
@@ -16,6 +17,8 @@ export default function Predictions() {
   const liveMatches = useMemo(() => matches.filter(m => m.gameStatus === 'LIVE'), [matches]);
   const liveScores = useLiveScores(liveMatches);
   const [dates, setDates] = useState<string[]>([]);
+  const tabBarRef = useRef<HTMLDivElement>(null);
+  const pageRef = useDateSwipe({ dates, selectedDate, setSelectedDate, tabBarRef });
 
   useEffect(() => {
     api.get('/matches/dates').then(res => {
@@ -101,7 +104,7 @@ export default function Predictions() {
     });
 
   return (
-    <div className="min-h-screen pb-28" style={{ background: '#ffffff' }}>
+    <div ref={pageRef} className="min-h-screen pb-28" style={{ background: '#ffffff' }}>
 
       {/* ── Header ── */}
       <header style={{ background: '#184A42' }}>
@@ -132,13 +135,14 @@ export default function Predictions() {
         className="sticky top-0 z-10 -mt-5 mx-4 max-w-2xl md:mx-auto rounded-2xl overflow-hidden shadow-sm"
         style={{ background: '#ffffff', border: '1px solid #E8F2F0' }}
       >
-        <div className="flex overflow-x-auto scrollbar-hide">
+        <div ref={tabBarRef} className="flex overflow-x-auto scrollbar-hide">
           {dates.map((date) => {
             const isActive = date === selectedDate;
             return (
               <button
                 key={date}
                 onClick={() => setSelectedDate(date)}
+                data-active={isActive}
                 className="px-4 py-3 text-sm whitespace-nowrap font-semibold transition shrink-0"
                 style={{
                   color: isActive ? '#184A42' : 'rgba(24,74,66,0.4)',
