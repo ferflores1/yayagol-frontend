@@ -179,7 +179,7 @@ export default function Predictions() {
           return (
             <div
               key={match.matchId}
-              className={`rounded-2xl transition ${matches.length === 1 ? 'nudge' : ''}`}
+              className="rounded-2xl transition"
               style={{
                 background: '#ffffff',
                 border: `1.5px solid ${isLive ? '#DE2C4C' : '#E8F2F0'}`,
