@@ -8,31 +8,33 @@ type MatchColumn = {
   id: number;
   team1: string;
   team2: string;
-  gameStatus: string;   // "SCHEDULED" | "LIVE" | "FINISHED"
+  gameStatus: string;
   score1: number | null;
   score2: number | null;
 };
 
-type UserPrediction = { score1: number; score2: number };
-type UserRow = { id: number; name: string; predictions: Record<number, UserPrediction> };
-
+type UserPrediction = {
+  hasPrediction: boolean;
+  score1: number | null;
+  score2: number | null;
+};
+type UserRow = { id: number; name: string; predictions: Record<string, UserPrediction> };
 type PredictionColor = 'gold' | 'green' | 'gray';
+type GroupData = {
+  groupName?: string;
+  currentUserId?: number;
+  users: UserRow[];
+  matches: MatchColumn[];
+};
 
-function getPredictionColor(
-  pred: UserPrediction,
-  match: MatchColumn
-): PredictionColor {
+function getPredictionColor(pred: UserPrediction, match: MatchColumn): PredictionColor {
   const active = match.gameStatus === 'LIVE' || match.gameStatus === 'FINISHED';
   if (!active || match.score1 === null || match.score2 === null) return 'gray';
-
-  // Gold — exact score
+  if (pred.score1 === null || pred.score2 === null) return 'gray';
   if (pred.score1 === match.score1 && pred.score2 === match.score2) return 'gold';
-
-  // Green — correct result (win / draw / loss)
   const predResult = Math.sign(pred.score1 - pred.score2);
   const actualResult = Math.sign(match.score1 - match.score2);
   if (predResult === actualResult) return 'green';
-
   return 'gray';
 }
 
@@ -42,13 +44,53 @@ const PILL_STYLES: Record<PredictionColor, { background: string; color: string }
   gray:  { background: '#E8F2F0', color: '#184A42' },
 };
 
+function PredictionCell({ pred, match, isCurrentUser }: {
+  pred: UserPrediction | undefined;
+  match: MatchColumn;
+  isCurrentUser: boolean;
+}) {
+  // No prediction made at all
+  if (!pred?.hasPrediction) {
+    return <span className="text-[rgba(24,74,66,0.25)] text-base font-bold">—</span>;
+  }
+
+  // Other user + scheduled → scores are null on purpose, show checkmark only
+  if (!isCurrentUser && match.gameStatus === 'SCHEDULED') {
+    return (
+      <span
+        className="inline-flex items-center justify-center w-6 h-6 rounded-full"
+        style={{ background: '#E8F2F0' }}
+        title="Predicción realizada"
+      >
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M2 6l3 3 5-5"
+            stroke="#184A42"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+    );
+  }
+
+  // Current user always sees their score; everyone sees scores once match starts
+  const color = getPredictionColor(pred, match);
+  return (
+    <span
+      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-extrabold tracking-[.04em]"
+      style={PILL_STYLES[color]}
+    >
+      {pred.score1}–{pred.score2}
+    </span>
+  );
+}
+
 export default function GroupPredictions() {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState('');
-  const [data, setData] = useState<{ groupName?: string; users: UserRow[]; matches: MatchColumn[] }>({
-    users: [],
-    matches: [],
-  });
+  const [data, setData] = useState<GroupData>({ users: [], matches: [] });
   const groupId = localStorage.getItem('selectedGroup');
   const [dates, setDates] = useState<string[]>([]);
   const tabBarRef = useRef<HTMLDivElement>(null);
@@ -145,7 +187,6 @@ export default function GroupPredictions() {
                     <div className="text-[10px] font-bold tracking-[.08em] uppercase text-white/60">
                       {m.team1} vs {m.team2}
                     </div>
-                    {/* Show live/final score in header when available */}
                     {(m.gameStatus === 'LIVE' || m.gameStatus === 'FINISHED') &&
                       m.score1 !== null && m.score2 !== null && (
                       <div className={`mt-1 text-[11px] font-black ${
@@ -162,40 +203,39 @@ export default function GroupPredictions() {
               </tr>
             </thead>
             <tbody>
-              {data.users.map((user) => (
-                <tr key={user.id} className="group">
-                  <td className="sticky left-0 z-[2] bg-white group-hover:bg-[#F5FAF9] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[13px] font-bold text-[#184A42] transition-colors">
-                    {user.name}
-                  </td>
-                  {data.matches.map((m) => {
-                    const pred = user.predictions?.[m.id];
-                    const color = pred ? getPredictionColor(pred, m) : 'gray';
-                    const style = PILL_STYLES[color];
-                    return (
-                      <td key={m.id} className="border-b-[1.5px] border-[#F5FAF9] px-2.5 py-2.5 text-center bg-white group-hover:bg-[#FAFCFC] transition-colors">
-                        {pred ? (
-                          <span
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-extrabold tracking-[.04em]"
-                            style={style}
-                          >
-                            {pred.score1}–{pred.score2}
-                          </span>
-                        ) : (
-                          <span className="text-[rgba(24,74,66,0.25)] text-base font-bold">—</span>
-                        )}
+              {data.users.map((user) => {
+                const isCurrentUser = user.id === data.currentUserId;
+                return (
+                  <tr key={user.id} className="group">
+                    <td className={`sticky left-0 z-[2] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[13px] font-bold text-[#184A42] transition-colors ${
+                      isCurrentUser ? 'bg-[#F5FAF9]' : 'bg-white group-hover:bg-[#F5FAF9]'
+                    }`}>
+                      {user.name}
+                      {isCurrentUser && (
+                        <span className="ml-1.5 text-[9px] font-bold text-[rgba(24,74,66,0.4)] uppercase tracking-wide">tú</span>
+                      )}
+                    </td>
+                    {data.matches.map((m) => (
+                      <td key={m.id} className={`border-b-[1.5px] border-[#F5FAF9] px-2.5 py-2.5 text-center transition-colors ${
+                        isCurrentUser ? 'bg-[#FAFCFC]' : 'bg-white group-hover:bg-[#FAFCFC]'
+                      }`}>
+                        <PredictionCell
+                          pred={user.predictions?.[String(m.id)]}
+                          match={m}
+                          isCurrentUser={isCurrentUser}
+                        />
                       </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-
       </div>
 
       <p className="text-[11px] font-medium text-[rgba(24,74,66,0.45)] px-4 py-3">
-        * Los resultados de los demás participantes aparecen al momento del inicio de los partidos.
+        ** Los resultados de los demás participantes aparecen al momento del inicio de los partidos.
       </p>
 
       <Footer />
