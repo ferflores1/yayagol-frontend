@@ -146,7 +146,7 @@ export default function Predictions() {
                 className="px-4 py-3 text-sm whitespace-nowrap font-semibold transition shrink-0"
                 style={{
                   color: isActive ? '#184A42' : 'rgba(24,74,66,0.4)',
-                  borderBottom: isActive ? '2.5px solid #184A42' : '2.5px solid transparent',
+                  borderBottom: isActive ? '2.5px solid #de2c4c' : '2.5px solid transparent',
                   background: 'transparent',
                 }}
               >
@@ -179,7 +179,7 @@ export default function Predictions() {
           return (
             <div
               key={match.matchId}
-              className="rounded-2xl transition"
+              className={`rounded-2xl transition ${matches.length === 1 ? 'nudge' : ''}`}
               style={{
                 background: '#ffffff',
                 border: `1.5px solid ${isLive ? '#DE2C4C' : '#E8F2F0'}`,
