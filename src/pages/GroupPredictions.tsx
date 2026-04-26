@@ -28,7 +28,8 @@ type GroupData = {
 };
 
 function getPredictionColor(pred: UserPrediction, match: MatchColumn): PredictionColor {
-  const active = match.gameStatus === 'LIVE' || match.gameStatus === 'FINISHED';
+  const active = match.gameStatus === 'LIVE' || match.gameStatus === 'FINISHED'
+  || match.gameStatus === 'AET' || match.gameStatus === 'PEN';
   if (!active || match.score1 === null || match.score2 === null) return 'gray';
   if (pred.score1 === null || pred.score2 === null) return 'gray';
   if (pred.score1 === match.score1 && pred.score2 === match.score2) return 'green';
@@ -187,7 +188,7 @@ export default function GroupPredictions() {
                     <div className="text-[10px] font-bold tracking-[.08em] uppercase text-white/60">
                       {m.team1} vs {m.team2}
                     </div>
-                    {(m.gameStatus === 'LIVE' || m.gameStatus === 'FINISHED') &&
+                    {(m.gameStatus === 'LIVE' || m.gameStatus === 'FINISHED' || m.gameStatus === 'AET' || m.gameStatus === 'PEN') &&
                       m.score1 !== null && m.score2 !== null && (
                       <div className={`mt-1 text-[11px] font-black ${
                         m.gameStatus === 'LIVE' ? 'text-[#DE2C4C]' : 'text-white/80'

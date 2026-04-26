@@ -174,7 +174,7 @@ export default function Predictions() {
           const isLocked = disabledMatches.has(match.matchId);
           const isSaved = savedMatches.has(match.matchId);
           const isLive = match.gameStatus === 'LIVE';
-          const isFinished = match.gameStatus === 'FINISHED';
+          const isFinished = match.gameStatus === 'FINISHED' || match.gameStatus === 'AET' || match.gameStatus === 'PEN';
 
           return (
             <div
