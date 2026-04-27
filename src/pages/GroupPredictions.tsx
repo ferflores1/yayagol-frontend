@@ -59,11 +59,11 @@ function PredictionCell({ pred, match, isCurrentUser }: {
   if (!isCurrentUser && match.gameStatus === 'SCHEDULED') {
     return (
       <span
-        className="inline-flex items-center justify-center w-6 h-6 rounded-full"
+        className="inline-flex items-center justify-center w-8 h-8 rounded-full"
         style={{ background: '#E8F2F0' }}
         title="Predicción realizada"
       >
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+        <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
           <path
             d="M2 6l3 3 5-5"
             stroke="#184A42"
@@ -80,7 +80,7 @@ function PredictionCell({ pred, match, isCurrentUser }: {
   const color = getPredictionColor(pred, match);
   return (
     <span
-      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-extrabold tracking-[.04em]"
+      className="inline-flex items-center px-3.5 py-1 rounded-full text-[15px] font-extrabold tracking-[.04em]"
       style={PILL_STYLES[color]}
     >
       {pred.score1}–{pred.score2}
@@ -177,6 +177,7 @@ export default function GroupPredictions() {
 
         {/* Table */}
         <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="min-w-[101%]">
           <table className="border-collapse" style={{ width: 'max-content', minWidth: '100%' }}>
             <thead>
               <tr>
@@ -232,6 +233,7 @@ export default function GroupPredictions() {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
