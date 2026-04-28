@@ -210,77 +210,82 @@
                     </span>
                   </div>
 
-                  {/* Match row */}
-                  <div className="px-4 py-4">
-                    <div className="grid grid-cols-3 items-center gap-3">
+                {/* Match row */}
+                <div className="px-4 py-5">
 
-                      {/* Home team */}
-                      <div className="flex flex-col items-center gap-1.5">
-                        <img src={match.homeTeamLogo} className="w-12 h-12 object-contain" />
-                        <p className="font-bold text-sm text-center leading-tight" style={{ color: '#111' }}>
-                          {match.homeTeam}
-                        </p>
-                      </div>
+                  {/* Teams with score in middle */}
+                  <div className="flex items-center justify-between gap-2">
 
-                      {/* Score inputs */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={2}
-                            value={pred.homeGoals}
-                            onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
-                            disabled={isLocked}
-                            className="w-14 h-14 text-center text-xl font-black rounded-xl outline-none transition"
-                            style={{
-                              border: `2px solid ${isLocked ? '#E8F2F0' : '#184A42'}`,
-                              color: isLocked ? '#aaa' : '#184A42',
-                              background: isLocked ? '#F5FAF9' : '#ffffff',
-                            }}
-                          />
-                          <span className="text-xs font-bold" style={{ color: 'rgba(24,74,66,0.35)' }}>vs</span>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={2}
-                            value={pred.awayGoals}
-                            onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
-                            disabled={isLocked}
-                            className="w-14 h-14 text-center text-xl font-black rounded-xl outline-none transition"
-                            style={{
-                              border: `2px solid ${isLocked ? '#E8F2F0' : '#184A42'}`,
-                              color: isLocked ? '#aaa' : '#184A42',
-                              background: isLocked ? '#F5FAF9' : '#ffffff',
-                            }}
-                          />
-                        </div>
-
-                        {/* Live / finished actual score */}
-                        {(isFinished || isLive) && (
-                          <div
-                            className="text-xs font-bold px-3 py-0.5 rounded-full"
-                            style={{
-                              background: isLive ? 'rgba(222,44,76,0.08)' : '#E8F2F0',
-                              color: isLive ? '#DE2C4C' : '#184A42',
-                            }}
-                          >
-                            {isLive && liveScore
-                              ? `${liveScore.homeGoals} - ${liveScore.awayGoals}`
-                              : `${match.matchScore?.homeGoals ?? '-'} - ${match.matchScore?.awayGoals ?? '-'}`}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Away team */}
-                      <div className="flex flex-col items-center gap-1.5">
-                        <img src={match.awayTeamLogo} className="w-12 h-12 object-contain" />
-                        <p className="font-bold text-sm text-center leading-tight" style={{ color: '#111' }}>
-                          {match.awayTeam}
-                        </p>
-                      </div>
+                    {/* Home team */}
+                    <div className="flex flex-col items-center gap-2 w-[30%]">
+                      <img src={match.homeTeamLogo} className="w-12 h-12 object-contain drop-shadow-sm" />
+                      <p className="font-black text-[11px] md:text-sm text-center leading-tight tracking-tight" style={{ color: '#111' }}>
+                        {match.homeTeam}
+                      </p>
                     </div>
+
+                    {/* Center: inputs + live score */}
+                    <div className="flex flex-col items-center gap-2 w-[40%]">
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={2}
+                          value={pred.homeGoals}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => updatePrediction(match.matchId, 'homeGoals', e.target.value.replace(/\D/g, ''))}
+                          disabled={isLocked}
+                          className="w-14 h-14 text-center text-xl font-black rounded-xl outline-none transition"
+                          style={{
+                            border: `2px solid ${isLocked ? '#E8F2F0' : '#184A42'}`,
+                            color: isLocked ? '#aaa' : '#184A42',
+                            background: isLocked ? '#F5FAF9' : '#ffffff',
+                          }}
+                        />
+                        <span className="text-[10px] font-black" style={{ color: 'rgba(24,74,66,0.3)' }}>—</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={2}
+                          value={pred.awayGoals}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => updatePrediction(match.matchId, 'awayGoals', e.target.value.replace(/\D/g, ''))}
+                          disabled={isLocked}
+                          className="w-14 h-14 text-center text-xl font-black rounded-xl outline-none transition"
+                          style={{
+                            border: `2px solid ${isLocked ? '#E8F2F0' : '#184A42'}`,
+                            color: isLocked ? '#aaa' : '#184A42',
+                            background: isLocked ? '#F5FAF9' : '#ffffff',
+                          }}
+                        />
+                      </div>
+
+                      {/* Live / finished score */}
+                      {(isFinished || isLive) && (
+                        <div
+                          className="text-xs font-bold px-3 py-0.5 rounded-full"
+                          style={{
+                            background: isLive ? 'rgba(222,44,76,0.08)' : '#E8F2F0',
+                            color: isLive ? '#DE2C4C' : '#184A42',
+                          }}
+                        >
+                          {isLive && liveScore
+                            ? `${liveScore.homeGoals} - ${liveScore.awayGoals}`
+                            : `${match.matchScore?.homeGoals ?? '-'} - ${match.matchScore?.awayGoals ?? '-'}`}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Away team */}
+                    <div className="flex flex-col items-center gap-2 w-[30%]">
+                      <img src={match.awayTeamLogo} className="w-12 h-12 object-contain drop-shadow-sm" />
+                      <p className="font-black text-[11px] md:text-sm text-center leading-tight tracking-tight" style={{ color: '#111' }}>
+                        {match.awayTeam}
+                      </p>
+                    </div>
+
                   </div>
+                </div>
 
                   {/* Card footer: save action */}
                   <div
