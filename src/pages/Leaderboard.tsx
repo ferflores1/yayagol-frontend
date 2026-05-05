@@ -14,7 +14,7 @@ const ScoringPanel = () => (
       </div>
       <div className="flex md:flex-col gap-2 p-3">
         <div className="flex-1 md:flex-none bg-gray-800 rounded-lg p-3 border border-gray-700 flex items-center gap-2">
-          <span className="text-yellow-400 font-black text-2xl md:text-3xl leading-none shrink-0">+3</span>
+          <span className="text-yellow-400 font-black text-2xl md:text-3xl leading-none shrink-0">+4    </span>
           <div>
             <p className="text-gray-400 text-[9px] uppercase tracking-wider font-semibold hidden md:block">Puntos por</p>
             <p className="text-white text-[11px] md:text-xs font-bold leading-tight">Acertar Resultado</p>

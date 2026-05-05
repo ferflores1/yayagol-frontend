@@ -181,14 +181,16 @@ export default function GroupPredictions() {
           <table className="border-collapse" style={{ width: 'max-content', minWidth: '100%' }}>
             <thead>
               <tr>
-                <th className="sticky left-0 z-[3] bg-[#184A42] text-left px-4 py-2.5 text-[10px] font-bold tracking-[.08em] uppercase text-white/55 min-w-[100px]">
+                <th className="sticky left-0 z-[3] bg-[#184A42] text-left px-4 py-2.5 text-[10px] font-bold tracking-[.08em] uppercase text-white/55 min-w-[80px] max-w-[140px]">
                   Jugador
                 </th>
                 {data.matches.map((m) => (
-                  <th key={m.id} className="bg-[#184A42] px-2.5 py-2.5 min-w-[76px]">
-                    <div className="text-[10px] font-bold tracking-[.08em] uppercase text-white/60">
-                      {m.team1} vs {m.team2}
-                    </div>
+                  <th key={m.id} className="bg-[#184A42] px-2.5 py-2.5 min-w-[64px]">
+                   <div className="text-[10px] font-bold tracking-[.08em] uppercase leading-tight text-center">
+                     <div className="text-white/80">{m.team1}</div>
+                     <div className="text-white/35 text-[9px] my-0.5">vs</div>
+                     <div className="text-white/80">{m.team2}</div>
+                   </div>
                     {(m.gameStatus === 'LIVE' || m.gameStatus === 'FINISHED' || m.gameStatus === 'AET' || m.gameStatus === 'PEN') &&
                       m.score1 !== null && m.score2 !== null && (
                       <div className={`mt-1 text-[11px] font-black ${
@@ -209,14 +211,16 @@ export default function GroupPredictions() {
                 const isCurrentUser = user.id === data.currentUserId;
                 return (
                   <tr key={user.id} className="group">
-                    <td className={`sticky left-0 z-[2] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[13px] font-bold text-[#184A42] transition-colors ${
+                  <td className={`sticky left-0 z-[2] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[13px] font-bold text-[#184A42] max-w-[140px] transition-colors ${
                       isCurrentUser ? 'bg-[#F5FAF9]' : 'bg-white group-hover:bg-[#F5FAF9]'
                     }`}>
-                      {user.name}
-                      {isCurrentUser && (
-                        <span className="ml-1.5 text-[9px] font-bold text-[rgba(24,74,66,0.4)] uppercase tracking-wide">tú</span>
-                      )}
-                    </td>
+                      <div className="flex items-center gap-1 min-w-0">
+                        <span className="truncate">{user.name}</span>
+                        {isCurrentUser && (
+                          <span className="shrink-0 text-[9px] font-bold text-[rgba(24,74,66,0.4)] uppercase tracking-wide">tú</span>
+                        )}
+                      </div>
+                  </td>
                     {data.matches.map((m) => (
                       <td key={m.id} className={`border-b-[1.5px] border-[#F5FAF9] px-2.5 py-2.5 text-center transition-colors ${
                         isCurrentUser ? 'bg-[#FAFCFC]' : 'bg-white group-hover:bg-[#FAFCFC]'
