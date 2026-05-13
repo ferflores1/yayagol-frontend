@@ -161,7 +161,7 @@ export default function GroupPredictions() {
                 key={date}
                 onClick={() => setSelectedDate(date)}
                 data-active={date === selectedDate}
-                className={`px-3 py-2.5 text-[11px] font-bold tracking-[.05em] uppercase border-b-2 transition-all ${
+                className={`px-3 py-2.5 text-[12px] font-bold tracking-[.05em] uppercase border-b-2 transition-all ${
                   date === selectedDate
                     ? 'text-[#184A42] border-[#DE2C4C]'
                     : 'text-[rgba(24,74,66,0.45)] border-transparent'
@@ -211,7 +211,7 @@ export default function GroupPredictions() {
                 const isCurrentUser = user.id === data.currentUserId;
                 return (
                   <tr key={user.id} className="group">
-                  <td className={`sticky left-0 z-[2] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[13px] font-bold text-[#184A42] max-w-[140px] transition-colors ${
+                  <td className={`sticky left-0 z-[2] border-r-[1.5px] border-[#E8F2F0] border-b-[1.5px] border-b-[#F5FAF9] px-4 py-2.5 text-[14px] font-bold text-[#184A42] max-w-[140px] transition-colors ${
                       isCurrentUser ? 'bg-[#F5FAF9]' : 'bg-white group-hover:bg-[#F5FAF9]'
                     }`}>
                       <div className="flex items-center gap-1 min-w-0">

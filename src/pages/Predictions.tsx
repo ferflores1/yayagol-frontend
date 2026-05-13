@@ -262,13 +262,13 @@
 
                       {/* Live / finished score */}
                       {(isFinished || isLive) && (
-                        <div
-                          className="text-xs font-bold px-3 py-0.5 rounded-full"
-                          style={{
-                            background: isLive ? 'rgba(222,44,76,0.08)' : '#E8F2F0',
-                            color: isLive ? '#DE2C4C' : '#184A42',
-                          }}
-                        >
+                       <div
+                         className="text-sm md:text-base font-bold px-4 py-1 rounded-full"
+                         style={{
+                           background: isLive ? 'rgba(222,44,76,0.08)' : '#E8F2F0',
+                           color: isLive ? '#DE2C4C' : '#184A42',
+                         }}
+                       >
                           {isLive && liveScore
                             ? `${liveScore.homeGoals} - ${liveScore.awayGoals}`
                             : `${match.matchScore?.homeGoals ?? '-'} - ${match.matchScore?.awayGoals ?? '-'}`}
