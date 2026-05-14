@@ -15,7 +15,7 @@ export interface Match {
   homeTeam: string;
   awayTeam: string;
   kickoffTime: string;
-  gameStatus: 'SCHEDULED' | 'LIVE' | 'FINISHED' | 'AET' | 'PEN';
+  gameStatus: 'SCHEDULED' | 'LIVE' | 'FINISHED' | 'PEN';
   gameStatusLabel: string;
   matchScore: MatchScore | null;
   homeTeamLogo: string;
